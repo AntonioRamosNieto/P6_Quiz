@@ -19,7 +19,6 @@ exports.load = (req, res, next, quizId) => {
 
 // GET /quizzes
 exports.index = (req, res, next) => {
-
     models.quiz.findAll()
     .then(quizzes => {
         res.render('quizzes/index.ejs', {quizzes});
@@ -152,4 +151,62 @@ exports.check = (req, res, next) => {
         result,
         answer
     });
+};
+
+// GET + /quizzes/randomcheck/:quizId?answer=respuesta
+exports.randomcheck = (req, res, next) => {
+
+    const {quiz, query, session} = req;
+    const answer = query.answer || "";
+    const result = answer.toLowerCase().trim() === quiz.answer.toLowerCase().trim();
+
+    session.randomPlay.push(quiz);
+    const score = session.randomPlay.length;
+
+    res.render('quizzes/random_result', {
+        answer,
+        result,
+        score
+    });
+};
+
+exports.randomplay = (req, res, next) => {
+
+    req.session.randomPlay = req.session.randomPlay || [];
+    const quizzes = req.session.randomPlay;
+    let ids = [];
+    quizzes.forEach( quiz1 => {
+        ids.push(quiz1.id);
+    });
+
+    console.log("\n ids: "+ids+" \n");
+    const whereOption = {id: {[Sequelize.Op.notIn]: ids}};
+
+        models.quiz.count({where: whereOption})
+            .then(count => {
+                return models.quiz.findAll({
+                    where: whereOption,
+                    offset: Math.floor(count * Math.random()),
+                    limit: 1
+                }).then(quizzes => {
+                    return quizzes[0];
+                });
+            })
+            .then(quiz => {
+                let score = req.session.randomPlay.length;
+                if(quiz === undefined){
+                    req.session.randomPlay = [];
+                    res.render('quizzes/random_none', {
+                        score: score
+                    });
+                }else {
+                    res.render('quizzes/random_play', {
+                        quiz: quiz,
+                        score: score
+                    });
+                }
+            }).catch(error => {
+            req.session.randomPlay = [];
+            next(error);
+        });
 };
