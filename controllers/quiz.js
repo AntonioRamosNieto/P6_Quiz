@@ -159,10 +159,9 @@ exports.randomcheck = (req, res, next) => {
     const {quiz, query, session} = req;
     const answer = query.answer || "";
     const result = answer.toLowerCase().trim() === quiz.answer.toLowerCase().trim();
-
+    const score = session.randomPlay.length+result;
     session.randomPlay.push(quiz);
-    const score = session.randomPlay.length;
-
+    if(!result) {req.session.randomPlay = [];}
     res.render('quizzes/random_result', {
         answer,
         result,
@@ -179,7 +178,7 @@ exports.randomplay = (req, res, next) => {
         ids.push(quiz1.id);
     });
 
-    console.log("\n ids: "+ids+" \n");
+    console.log("\n ids: "+req.session.randomPlay+" \n");
     const whereOption = {id: {[Sequelize.Op.notIn]: ids}};
 
         models.quiz.count({where: whereOption})
