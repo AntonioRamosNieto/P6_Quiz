@@ -285,9 +285,9 @@ exports.randomplay = (req, res, next) => {
 
 //GET /quizzes/anonymousQuizzes
 exports.anonymousQuizzes = (req, res, next) => {
-    model.quiz.findAll({where:{authorId:0}})
+    models.quiz.findAll({where:{authorId:null}})
         .then(quizzes =>{
-            res.render('/quizzes/anonymousQuizzes', {quizzes:quizzes});
+            res.render('quizzes/anonymousQuizzes', {quizzes:quizzes||0});
         })
         .catch(error => {next(error);});
 };
