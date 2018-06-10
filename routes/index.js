@@ -143,4 +143,7 @@ router.get('/quizzes/:quizId(\\d+)/tips/:tipId(\\d+)/edit', sessionController.lo
 //PUT /quizzes/:quizId/tips/:tipId
 router.put('/quizzes/:quizId(\\d+)/tips/:tipId(\\d+)', sessionController.loginRequired,tipController.adminOrAuthorRequired,tipController.update);
 
+//GET /quizzes/anonymousQuizzes
+router.get('/quizzes/anonymousQuizzes', quizController.anonymousQuizzes);
+
 module.exports = router;

@@ -282,3 +282,12 @@ exports.randomplay = (req, res, next) => {
             next(error);
         });
 };
+
+//GET /quizzes/anonymousQuizzes
+exports.anonymousQuizzes = (req, res, next) => {
+    model.quiz.findAll({where:{authorId:0}})
+        .then(quizzes =>{
+            res.render('/quizzes/anonymousQuizzes', {quizzes:quizzes});
+        })
+        .catch(error => {next(error);});
+};
